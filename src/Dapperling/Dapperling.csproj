@@ -13,7 +13,7 @@
     <PackageProjectUrl>https://github.com/robertcoltheart/dapperling</PackageProjectUrl>
     <RepositoryUrl>https://github.com/robertcoltheart/dapperling</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>dapper crud</PackageTags>
+    <PackageTags>dapper crud orm micro-orm sql</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
