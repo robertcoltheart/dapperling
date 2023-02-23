@@ -1,6 +1,4 @@
-﻿using Dapper;
-
-namespace Dapperling.Tests.Models;
+﻿namespace Dapper.Tests.Models;
 
 public class GenericType<T>
 {

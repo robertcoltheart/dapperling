@@ -1,4 +1,4 @@
-﻿namespace Dapperling.Tests.Models;
+﻿namespace Dapper.Tests.Models;
 
 public class Article
 {

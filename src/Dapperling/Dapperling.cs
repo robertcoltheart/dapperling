@@ -22,9 +22,9 @@ public static class Dapperling
 
     private static readonly ConcurrentDictionary<Type, PropertyInfo> KeyProperty = new();
 
-    private static readonly ConcurrentDictionary<Type, string> TableNames = new();
+    private static readonly ConcurrentDictionary<(Type, string), string> TableNames = new();
 
-    private static readonly ConcurrentDictionary<PropertyInfo, string> ColumnNames = new();
+    private static readonly ConcurrentDictionary<(PropertyInfo, string), string> ColumnNames = new();
 
     private static readonly ISqlAdapter DefaultAdapter = new SqlServerAdapter();
 
@@ -356,11 +356,16 @@ public static class Dapperling
         return value.ToString();
     }
 
-    private static ISqlAdapter GetAdapter(IDbConnection connection)
+    private static string GetDatabaseName(IDbConnection connection)
     {
-        var databaseName = GetDatabaseType != null
+        return GetDatabaseType != null
             ? GetDatabaseType(connection)
             : connection.GetType().Name.ToLower();
+    }
+
+    private static ISqlAdapter GetAdapter(IDbConnection connection)
+    {
+        var databaseName = GetDatabaseName(connection);
 
         return Adapters.TryGetValue(databaseName, out var value)
             ? value
@@ -369,7 +374,9 @@ public static class Dapperling
 
     private static string GetTableName(IDbConnection connection, Type type)
     {
-        return TableNames.GetOrAdd(type, _ =>
+        var databaseName = GetDatabaseName(connection);
+
+        return TableNames.GetOrAdd((type, databaseName), _ =>
         {
             var attribute = type.GetCustomAttribute<TableAttribute>();
 
@@ -381,13 +388,15 @@ public static class Dapperling
 
     private static string GetColumnName(IDbConnection connection, PropertyInfo property)
     {
-        return ColumnNames.GetOrAdd(property, x =>
+        var databaseName = GetDatabaseName(connection);
+
+        return ColumnNames.GetOrAdd((property, databaseName), x =>
         {
-            var attribute = x.GetCustomAttribute<ColumnAttribute>();
+            var attribute = property.GetCustomAttribute<ColumnAttribute>();
 
             return attribute != null
                 ? attribute.Name
-                : GetAdapter(connection).GetColumnName(x);
+                : GetAdapter(connection).GetColumnName(property);
         });
     }
 

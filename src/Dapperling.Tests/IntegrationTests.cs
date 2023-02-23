@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Dapper;
 using Npgsql;
 using Xunit;
 
-namespace Dapperling.Tests;
+namespace Dapper.Tests;
 
 public class IntegrationTests : IDisposable
 {

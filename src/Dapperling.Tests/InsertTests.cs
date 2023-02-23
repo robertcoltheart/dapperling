@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Dapper;
-using Dapperling.Tests.Models;
+using Dapper.Tests.Models;
 using Xunit;
 
-namespace Dapperling.Tests;
+namespace Dapper.Tests;
 
 public class InsertTests : MockConnectionTests
 {
