@@ -81,4 +81,13 @@ public class InsertTests : MockConnectionTests
 
         Assert.Equal(1, result);
     }
+
+    [Fact]
+    public void CanInsertIntoCorrectTableUsingPostgres()
+    {
+        var result = GetScalarConnection("insert into Articles ([Title], [Description]) values (@Title, @Description)")
+            .Insert(new Article { Id = 1, Title = "title" });
+
+        Assert.Equal(1, result);
+    }
 }
