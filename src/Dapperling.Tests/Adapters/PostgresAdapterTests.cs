@@ -1,8 +1,7 @@
-﻿using Dapper;
-using Dapperling.Tests.Models;
+﻿using Dapper.Tests.Models;
 using Xunit;
 
-namespace Dapperling.Tests.Adapters;
+namespace Dapper.Tests.Adapters;
 
 public class PostgresAdapterTests
 {

@@ -1,6 +1,4 @@
-﻿using Dapper;
-
-namespace Dapperling.Tests.Models;
+﻿namespace Dapper.Tests.Models;
 
 [Table("table_name")]
 public class TableWithExplicitColumn

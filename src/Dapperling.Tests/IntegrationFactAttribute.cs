@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Dapperling.Tests;
+namespace Dapper.Tests;
 
 #if DEBUG
 public class IntegrationFactAttribute : FactAttribute

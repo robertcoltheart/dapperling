@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Dapper;
-using Dapperling.Tests.Models;
+using Dapper.Tests.Models;
 using Xunit;
 
-namespace Dapperling.Tests;
+namespace Dapper.Tests;
 
 public class InsertTests : MockConnectionTests
 {
@@ -89,5 +88,21 @@ public class InsertTests : MockConnectionTests
             .Insert(new Article { Id = 1, Title = "title" });
 
         Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void TableAndColumnNamesGeneratedPerConnection()
+    {
+        Dapperling.GetDatabaseType = _ => "sql";
+        Dapperling.RegisterAdapter("sql", new SqlServerAdapter());
+
+        GetScalarConnection("insert into PascalCases ([LongName]) values (@LongName)")
+            .Insert(new PascalCase {Id = 1, LongName = "title"});
+
+        Dapperling.GetDatabaseType = _ => "pg";
+        Dapperling.RegisterAdapter("pg", new PostgresAdapter());
+
+         GetScalarConnection("insert into pascal_cases (\"long_name\") values (@LongName)")
+            .Insert(new PascalCase { Id = 1, LongName = "title" });
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Apps72.Dev.Data.DbMocker;
 using System.Data;
 
-namespace Dapperling.Tests;
+namespace Dapper.Tests;
 
 public abstract class MockConnectionTests
 {
