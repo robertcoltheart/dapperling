@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Dapper.Tests.Models;
 using Xunit;
 
@@ -86,6 +87,15 @@ public class InsertTests : MockConnectionTests
     {
         var result = GetScalarConnection("insert into Articles ([Title], [Description]) values (@Title, @Description)")
             .Insert(new Article { Id = 1, Title = "title" });
+
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void CanInsertWithNullableKey()
+    {
+        var result = GetScalarConnection("insert into ModelWithNullables ([DateTime]) values (@DateTime)")
+            .Insert(new ModelWithNullable { Id = 1, DateTime = DateTime.Now });
 
         Assert.Equal(1, result);
     }
