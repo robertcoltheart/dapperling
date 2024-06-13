@@ -25,4 +25,10 @@ public class SqlServerAdapter : ISqlAdapter
     {
         return $"[{columnName}]";
     }
+
+    /// <inheritdoc />
+    public string GetIdentitySql(string table, string column)
+    {
+        return "select SCOPE_IDENTITY() id";
+    }
 }

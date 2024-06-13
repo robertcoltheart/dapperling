@@ -25,4 +25,10 @@ public class SQLiteAdapter : ISqlAdapter
     {
         return $"\"{columnName}\"";
     }
+
+    /// <inheritdoc />
+    public string GetIdentitySql(string table, string column)
+    {
+        return "SELECT LAST_INSERT_ROWID() AS id";
+    }
 }
