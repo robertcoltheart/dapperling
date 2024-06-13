@@ -32,6 +32,12 @@ public class PostgresAdapter : ISqlAdapter
         return $"\"{columnName}\"";
     }
 
+    /// <inheritdoc />
+    public string GetIdentitySql(string table, string column)
+    {
+        return "SELECT LASTVAL() AS id";
+    }
+
     private string GetKebabCase(string value)
     {
         var values = value.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x : x.ToString());

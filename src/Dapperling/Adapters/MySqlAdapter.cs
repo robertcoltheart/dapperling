@@ -25,4 +25,10 @@ public class MySqlAdapter : ISqlAdapter
     {
         return $"[{columnName}]";
     }
+
+    /// <inheritdoc />
+    public string GetIdentitySql(string table, string column)
+    {
+        return "SELECT LAST_INSERT_ID() AS id";
+    }
 }
