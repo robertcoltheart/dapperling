@@ -57,7 +57,7 @@ public static class DbConnectionExtensions
     {
         var sql = GetSelectSql<T>(connection);
 
-        var value = await connection.QueryAsync<T>(sql, new { id }, transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+        var value = await connection.QueryAsync<T>(sql, new { id }, transaction, commandTimeout).ConfigureAwait(false);
 
         return value.FirstOrDefault();
     }
@@ -79,6 +79,24 @@ public static class DbConnectionExtensions
     }
 
     /// <summary>
+    /// Get all rows for a specified type given the specified where clauses
+    /// </summary>
+    /// <typeparam name="T">The type of the object to get</typeparam>
+    /// <param name="connection">The database connection</param>
+    /// <param name="whereClause">The object containing where clauses</param>
+    /// <param name="transaction">The transaction to run the query in</param>
+    /// <param name="commandTimeout">The timeout in seconds</param>
+    /// <returns>All rows for the specified type</returns>
+    public static IEnumerable<T> GetAll<T>(this IDbConnection connection, object whereClause, IDbTransaction? transaction = null, int? commandTimeout = null)
+        where T : class
+    {
+        var sql = GetSelectAllSql<T>(connection);
+        var where = GetWhereClause<T>(connection, whereClause);
+
+        return connection.Query<T>($"{sql} where {where}", whereClause, transaction, commandTimeout: commandTimeout);
+    }
+
+    /// <summary>
     /// Get all rows for a specified type
     /// </summary>
     /// <typeparam name="T">The type of the object to get</typeparam>
@@ -91,7 +109,25 @@ public static class DbConnectionExtensions
     {
         var sql = GetSelectAllSql<T>(connection);
 
-        return await connection.QueryAsync<T>(sql, null, transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+        return await connection.QueryAsync<T>(sql, null, transaction, commandTimeout).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Get all rows for a specified type
+    /// </summary>
+    /// <typeparam name="T">The type of the object to get</typeparam>
+    /// <param name="connection">The database connection</param>
+    /// <param name="whereClause">The object containing where clauses</param>
+    /// <param name="transaction">The transaction to run the query in</param>
+    /// <param name="commandTimeout">The timeout in seconds</param>
+    /// <returns>All rows for the specified type</returns>
+    public static async Task<IEnumerable<T>> GetAllAsync<T>(this IDbConnection connection, object whereClause, IDbTransaction? transaction = null, int? commandTimeout = null)
+        where T : class
+    {
+        var sql = GetSelectAllSql<T>(connection);
+        var where = GetWhereClause<T>(connection, whereClause);
+
+        return await connection.QueryAsync<T>($"{sql} where {where}", whereClause, transaction, commandTimeout).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -108,7 +144,7 @@ public static class DbConnectionExtensions
     {
         var sql = GetInsertSql<T>(connection);
 
-        return connection.Execute(sql, entity, transaction, commandTimeout: commandTimeout);
+        return connection.Execute(sql, entity, transaction, commandTimeout);
     }
 
     /// <summary>
@@ -125,7 +161,7 @@ public static class DbConnectionExtensions
     {
         var sql = GetInsertSql<T>(connection);
 
-        return await connection.ExecuteAsync(sql, entity, transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+        return await connection.ExecuteAsync(sql, entity, transaction, commandTimeout).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -142,7 +178,7 @@ public static class DbConnectionExtensions
     {
         var sql = GetUpdateSql<T>(connection);
 
-        return connection.Execute(sql, entity, transaction, commandTimeout: commandTimeout);
+        return connection.Execute(sql, entity, transaction, commandTimeout);
     }
 
     /// <summary>
@@ -159,7 +195,7 @@ public static class DbConnectionExtensions
     {
         var sql = GetUpdateSql<T>(connection);
 
-        return await connection.ExecuteAsync(sql, entity, transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+        return await connection.ExecuteAsync(sql, entity, transaction, commandTimeout).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -176,7 +212,7 @@ public static class DbConnectionExtensions
     {
         var sql = GetDeleteSql<T>(connection);
 
-        return connection.Execute(sql, entity, transaction, commandTimeout: commandTimeout);
+        return connection.Execute(sql, entity, transaction, commandTimeout);
     }
 
     /// <summary>
@@ -193,7 +229,7 @@ public static class DbConnectionExtensions
     {
         var sql = GetDeleteSql<T>(connection);
 
-        return await connection.ExecuteAsync(sql, entity, transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+        return await connection.ExecuteAsync(sql, entity, transaction, commandTimeout).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -209,7 +245,25 @@ public static class DbConnectionExtensions
     {
         var sql = GetDeleteAllSql<T>(connection);
 
-        return connection.Execute(sql, null, transaction, commandTimeout: commandTimeout);
+        return connection.Execute(sql, null, transaction, commandTimeout);
+    }
+
+    /// <summary>
+    /// Deletes all rows for a specified type
+    /// </summary>
+    /// <typeparam name="T">The type of the object to delete</typeparam>
+    /// <param name="connection">The database connection</param>
+    /// <param name="whereClause">The object containing where clauses</param>
+    /// <param name="transaction">The transaction to run the query in</param>
+    /// <param name="commandTimeout">The timeout in seconds</param>
+    /// <returns>The number of affected rows</returns>
+    public static int DeleteAll<T>(this IDbConnection connection, object whereClause, IDbTransaction? transaction = null, int? commandTimeout = null)
+        where T : class
+    {
+        var sql = GetDeleteAllSql<T>(connection);
+        var where = GetWhereClause<T>(connection, whereClause);
+
+        return connection.Execute($"{sql} where {where}", whereClause, transaction, commandTimeout);
     }
 
     /// <summary>
@@ -225,10 +279,27 @@ public static class DbConnectionExtensions
     {
         var sql = GetDeleteAllSql<T>(connection);
 
-        return await connection.ExecuteAsync(sql, null, transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+        return await connection.ExecuteAsync(sql, null, transaction, commandTimeout).ConfigureAwait(false);
     }
 
 
+    /// <summary>
+    /// Deletes all rows for a specified type
+    /// </summary>
+    /// <typeparam name="T">The type of the object to delete</typeparam>
+    /// <param name="connection">The database connection</param>
+    /// <param name="whereClause">The object containing where clauses</param>
+    /// <param name="transaction">The transaction to run the query in</param>
+    /// <param name="commandTimeout">The timeout in seconds</param>
+    /// <returns>The number of affected rows</returns>
+    public static async Task<int> DeleteAllAsync<T>(this IDbConnection connection, object whereClause, IDbTransaction? transaction = null, int? commandTimeout = null)
+        where T : class
+    {
+        var sql = GetDeleteAllSql<T>(connection);
+        var where = GetWhereClause<T>(connection, whereClause);
+
+        return await connection.ExecuteAsync($"{sql} where {where}", whereClause, transaction, commandTimeout).ConfigureAwait(false);
+    }
 
     private static string GetSelectSql<T>(IDbConnection connection)
     {
@@ -311,6 +382,55 @@ public static class DbConnectionExtensions
         return $"delete from {tableName}";
     }
 
+    private static string? GetWhereClause<T>(IDbConnection connection, object? whereClause)
+    {
+        if (whereClause == null)
+        {
+            return null;
+        }
+
+        var adapter = GetAdapter(connection);
+
+        var whereProperties = whereClause.GetType().GetProperties();
+        var entityProperties = GetProperties(typeof(T));
+
+        var clause = new StringBuilder();
+
+        for (var i = 0; i < whereProperties.Length; i++)
+        {
+            var property = whereProperties[i];
+
+            if (!property.CanRead)
+            {
+                continue;
+            }
+
+            var entityProperty = entityProperties.FirstOrDefault(x => x.Name.Equals(property.Name, StringComparison.OrdinalIgnoreCase));
+
+            var columnName = entityProperty != null
+                ? GetColumnName(connection, entityProperty)
+                : property.Name;
+
+            var isNull = property.GetValue(whereClause, null) is null or DBNull;
+
+            if (isNull)
+            {
+                clause.Append($"{adapter.EncapsulateColumn(columnName)} is null");
+            }
+            else
+            {
+                clause.Append($"{adapter.EncapsulateColumn(columnName)} = @{property.Name}");
+            }
+
+            if (i < whereProperties.Length - 1)
+            {
+                clause.Append(" and ");
+            }
+        }
+
+        return clause.ToString();
+    }
+
     private static string JoinColumnsQuery(IDbConnection connection, IEnumerable<PropertyInfo> properties, string joinValue)
     {
         var adapter = GetAdapter(connection);
@@ -366,7 +486,7 @@ public static class DbConnectionExtensions
     {
         var databaseName = GetDatabaseName(connection);
 
-        return ColumnNames.GetOrAdd((property, databaseName), x =>
+        return ColumnNames.GetOrAdd((property, databaseName), _ =>
         {
             var attribute = property.GetCustomAttribute<ColumnAttribute>();
 

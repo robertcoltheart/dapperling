@@ -73,6 +73,33 @@ public class DeleteTests : MockConnectionTests
     }
 
     [Fact]
+    public void CanDeleteAllWithWhereClause()
+    {
+        var result = GetScalarConnection("delete from Articles where [Title] = @title")
+            .DeleteAll<Article>(new { title = "Tale of Three Cities" });
+
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void CanDeleteAllWithWhereClauseWithNamedColumn()
+    {
+        var result = GetScalarConnection("delete from table_name where [column_name] = @name")
+            .DeleteAll<TableWithExplicitColumn>(new { name = "Tale of Three Cities" });
+
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void CanDeleteAllWithWhereClauseWithUnknownColumn()
+    {
+        var result = GetScalarConnection("delete from table_name where [column_name] = @column_name")
+            .DeleteAll<TableWithExplicitColumn>(new { column_name = "Tale of Three Cities" });
+
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
     public async Task CanDeleteAllAsync()
     {
         var result = await GetScalarConnection("delete from Articles")

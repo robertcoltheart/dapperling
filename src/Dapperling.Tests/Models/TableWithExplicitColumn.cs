@@ -7,4 +7,7 @@ public class TableWithExplicitColumn
 
     [Column("column_name")]
     public string Name { get; set; }
+
+    [Ignore]
+    public string Value { get; set; }
 }
