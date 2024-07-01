@@ -25,4 +25,10 @@ public class FirebaseAdapter : ISqlAdapter
     {
         return $"{columnName}";
     }
+
+    /// <inheritdoc />
+    public string GetIdentitySql(string table, string column)
+    {
+        return $"select first 1 {column} from {table} order by {column} desc";
+    }
 }

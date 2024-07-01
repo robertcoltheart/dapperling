@@ -10,7 +10,7 @@ public abstract class MockConnectionTests
         var connection = new MockDbConnection();
         connection.Mocks
             .HasValidSqlServerCommandText()
-            .When(x => x.CommandText == expectedSql)
+            .When(x => x.CommandText.StartsWith(expectedSql))
             .ReturnsScalar(1);
 
         return connection;

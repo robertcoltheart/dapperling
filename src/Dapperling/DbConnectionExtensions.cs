@@ -138,11 +138,25 @@ public static class DbConnectionExtensions
     /// <param name="entity">The object data to insert</param>
     /// <param name="transaction">The transaction to run the query in</param>
     /// <param name="commandTimeout">The timeout in seconds</param>
-    /// <returns>The number of affected rows</returns>
-    public static int Insert<T>(this IDbConnection connection, T entity, IDbTransaction? transaction = null, int? commandTimeout = null)
+    /// <returns>The id of the inserted row or the number of rows inserted if a collection is inserted</returns>
+    public static long Insert<T>(this IDbConnection connection, T entity, IDbTransaction? transaction = null, int? commandTimeout = null)
         where T : class
     {
         var sql = GetInsertSql<T>(connection);
+
+        var keyProperties = GetKeyProperties(typeof(T));
+
+        if (keyProperties.Any())
+        {
+            var result = connection.QueryFirst<long>(sql, entity, transaction, commandTimeout);
+
+            var property = keyProperties.First();
+            var keyType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            
+            property.SetValue(entity, Convert.ChangeType(result, keyType));
+
+            return result;
+        }
 
         return connection.Execute(sql, entity, transaction, commandTimeout);
     }
@@ -155,11 +169,25 @@ public static class DbConnectionExtensions
     /// <param name="entity">The object data to insert</param>
     /// <param name="transaction">The transaction to run the query in</param>
     /// <param name="commandTimeout">The timeout in seconds</param>
-    /// <returns>The number of affected rows</returns>
-    public static async Task<int> InsertAsync<T>(this IDbConnection connection, T entity, IDbTransaction? transaction = null, int? commandTimeout = null)
+    /// <returns>The id of the inserted row or the number of rows inserted if a collection is inserted</returns>
+    public static async Task<long> InsertAsync<T>(this IDbConnection connection, T entity, IDbTransaction? transaction = null, int? commandTimeout = null)
         where T : class
     {
         var sql = GetInsertSql<T>(connection);
+
+        var keyProperties = GetKeyProperties(typeof(T));
+
+        if (keyProperties.Any())
+        {
+            var result = await connection.QueryFirstAsync<long>(sql, entity, transaction, commandTimeout).ConfigureAwait(false);
+
+            var property = keyProperties.First();
+            var keyType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+
+            property.SetValue(entity, Convert.ChangeType(result, keyType));
+
+            return result;
+        }
 
         return await connection.ExecuteAsync(sql, entity, transaction, commandTimeout).ConfigureAwait(false);
     }
@@ -345,8 +373,11 @@ public static class DbConnectionExtensions
         }
 
         var tableName = GetTableName(connection, type);
+        var identityQuery = keyProperties.Any() && type == typeof(T)
+            ? $";{adapter.GetIdentitySql(tableName, GetColumnName(connection, keyProperties.First()))}"
+            : string.Empty;
 
-        return $"insert into {tableName} ({columns}) values ({parameters})";
+        return $"insert into {tableName} ({columns}) values ({parameters}){identityQuery}";
     }
 
     private static string GetUpdateSql<T>(IDbConnection connection)

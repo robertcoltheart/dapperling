@@ -32,7 +32,7 @@ public class IntegrationTests : IDisposable
 
         var result = connection.Insert(position);
 
-        Assert.Equal(1, result);
+        Assert.Equal(position.Id, result);
     }
 
     [IntegrationFact]
