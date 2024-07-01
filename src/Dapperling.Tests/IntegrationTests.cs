@@ -140,6 +140,25 @@ public class IntegrationTests : IDisposable
         Assert.Equal("value", result.TagValue);
     }
 
+    [IntegrationFact]
+    public void CanSelectWithWhere()
+    {
+        var connection = new NpgsqlConnection(ConnectionString);
+
+        var position = new BlogMetadata
+        {
+            Id = 1,
+            Key = "title",
+            TagValue = "value"
+        };
+
+        connection.Insert(position);
+
+        var item = connection.GetAll<BlogMetadata>(new { key = "title" }).First();
+
+        Assert.NotNull(item);
+    }
+
     public void Dispose()
     {
         using var connection = new NpgsqlConnection(ConnectionString);
